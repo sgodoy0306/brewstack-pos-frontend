@@ -21,11 +21,22 @@ El proyecto es un POS para cafeteria en React + Vite + Tailwind v4 + TanStack Qu
 - Fase 3: Cart state (Zustand store)
 - Fase 4: Offline/PWA (IndexedDB, useOfflineSync)
 
-**Estado al 2026-03-16:**
+**Estado al 2026-03-16 (segunda revision):**
 - Scaffolding e infraestructura: COMPLETO
-- Fase 1 (api-layer): 0% — no existe src/services/, src/hooks/, src/types/
-- App.tsx es el boilerplate default de Vite, sin limpiar
+- Fase 1 (api-layer): COMPLETA — todos los archivos existen y son coherentes
+  - src/api/axios.ts: instancia Axios con interceptor de error tipado
+  - src/types/: 6 archivos (barista, error, finance, order, recipe, stock)
+  - src/services/: 5 archivos (barista, brew, finance, recipe, stock)
+  - src/hooks/: 5 archivos (useBaristas, useBrewOrder, useFinance, useRecipes, useStock)
+- App.tsx: AUN ES EL BOILERPLATE DEFAULT DE VITE — sin limpiar, pendiente
+- main.tsx: BIEN — QueryClient con staleTime 30s, retry 1, ReactQueryDevtools en DEV, BrowserRouter
+- .env: VITE_API_BASE_URL=http://localhost:8181/api configurado
 
-**Why:** El commit "feat: initialize project" solo instalo dependencias y configuro providers en main.tsx. El branch feat/api-layer existe pero no tiene ningun archivo de la capa API todavia.
+**Problema critico identificado:**
+- plan.md menciona src/api/queryClient.ts como archivo separado, pero QueryClient esta en main.tsx (decision correcta, plan desactualizado)
+- App.tsx es basura Vite — el primer paso de Fase 2 es limpiarla y crear el layout 70/30
+- price en RecipeDTO es number (float), pero plan.md dice manejar en centavos. Inconsistencia: el backend devuelve float, el plan pide enteros internamente. Decision pendiente.
 
-**How to apply:** Al disenar la Fase 1, el orden correcto es: types/ -> services/api.ts -> services/*Service.ts -> hooks/use*.ts -> limpiar App.tsx con layout base 70/30.
+**Why:** La Fase 1 fue ejecutada correctamente. La inconsistencia de precios viene del contrato del backend (Java double -> JSON float) vs la convencion del plan (centavos enteros).
+
+**How to apply:** Al iniciar Fase 2: limpiar App.tsx primero, luego crear router.tsx con rutas base, luego PosLayout con split 70/30. El issue de centavos vs float debe resolverse en una capa de transformacion en los hooks o services antes de que llegue a la UI.
