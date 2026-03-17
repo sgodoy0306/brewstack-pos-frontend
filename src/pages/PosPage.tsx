@@ -5,11 +5,13 @@ import { PastriesGrid } from '../components/pos/PastriesGrid'
 import { CartPanelContent } from '../components/pos/CartPanel'
 import { AddPastryModal } from '../components/pos/AddPastryModal'
 import { ProductDetailModal } from '../components/pos/ProductDetailModal'
+import { PastryDetailModal } from '../components/pos/PastryDetailModal'
 import { useRecipes } from '../hooks/useRecipes'
 import { usePastries } from '../hooks/usePastries'
 import { useCartStore } from '../store/cartStore'
 import { useToast } from '../context/ToastContext'
 import type { RecipeDTO } from '../types/recipe'
+import type { PastryDTO } from '../types/pastry'
 import type { OrderSummaryDTO } from '../types/order'
 
 /** The two catalog tabs available in the POS left panel. */
@@ -35,6 +37,7 @@ export function PosPage() {
   const [activeCategory, setActiveCategory] = useState<ActiveCategory>('coffees')
   const [isAddPastryModalOpen, setIsAddPastryModalOpen] = useState(false)
   const [detailRecipe, setDetailRecipe] = useState<RecipeDTO | null>(null)
+  const [detailPastry, setDetailPastry] = useState<PastryDTO | null>(null)
 
   const { recipes, isLoading: recipesLoading, isError: recipesError, error: recipesRawError, refetch: refetchRecipes } = useRecipes()
   const { pastries, isLoading: pastriesLoading, isError: pastriesError, error: pastriesRawError, refetch: refetchPastries } = usePastries()
@@ -156,6 +159,7 @@ export function PosPage() {
                   isError={pastriesError}
                   errorMessage={pastriesErrorMessage}
                   onRetry={refetchPastries}
+                  onDetail={setDetailPastry}
                 />
               )}
             </div>
@@ -180,6 +184,12 @@ export function PosPage() {
       <ProductDetailModal
         recipe={detailRecipe}
         onClose={() => setDetailRecipe(null)}
+      />
+
+      {/* Pastry Detail Modal — rendered outside PosLayout so z-index stacks correctly */}
+      <PastryDetailModal
+        pastry={detailPastry}
+        onClose={() => setDetailPastry(null)}
       />
     </>
   )
