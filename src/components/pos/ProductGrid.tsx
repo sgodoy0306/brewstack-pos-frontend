@@ -11,6 +11,8 @@ interface ProductGridProps {
   errorMessage?: string
   onRetry?: () => void
   onProductSelect: (recipe: RecipeDTO) => void
+  /** Called when the info button on a product card is tapped. */
+  onDetail: (recipe: RecipeDTO) => void
 }
 
 /**
@@ -29,6 +31,7 @@ export function ProductGrid({
   errorMessage,
   onRetry,
   onProductSelect,
+  onDetail,
 }: ProductGridProps) {
   /**
    * Stable reference for the recipe list — avoids grid re-mounts when the
@@ -81,7 +84,7 @@ export function ProductGrid({
       >
         {stableRecipes.map((recipe) => (
           <li key={recipe.id} role="listitem">
-            <ProductCard recipe={recipe} onSelect={onProductSelect} />
+            <ProductCard recipe={recipe} onSelect={onProductSelect} onDetail={onDetail} />
           </li>
         ))}
       </ul>
