@@ -5,6 +5,7 @@ import { useCartStore } from '../../store/cartStore'
 
 interface PastryCardProps {
   pastry: PastryDTO
+  onDetail: (pastry: PastryDTO) => void
 }
 
 /**
@@ -18,7 +19,7 @@ interface PastryCardProps {
  * - Adapts PastryDTO to a RecipeDTO-compatible shape before calling addItem,
  *   since the cart store only knows about RecipeDTO
  */
-export const PastryCard = memo(function PastryCard({ pastry }: PastryCardProps) {
+export const PastryCard = memo(function PastryCard({ pastry, onDetail }: PastryCardProps) {
   const addItem = useCartStore((state) => state.addItem)
 
   const handleSelect = useCallback(() => {
@@ -51,7 +52,7 @@ export const PastryCard = memo(function PastryCard({ pastry }: PastryCardProps) 
       }
       className={[
         // Card shell — mirrors ProductCard structure
-        'flex flex-col w-full rounded-2xl overflow-hidden',
+        'relative flex flex-col w-full rounded-2xl overflow-hidden',
         'bg-white border border-stone-200 shadow-sm',
         // Touch feedback (only when available)
         'transition-all duration-100 select-none',
@@ -68,6 +69,25 @@ export const PastryCard = memo(function PastryCard({ pastry }: PastryCardProps) 
         .filter(Boolean)
         .join(' ')}
     >
+      {/* Info button — opens detail modal without adding to cart */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onDetail(pastry)
+        }}
+        aria-label={`View details for ${pastry.name}`}
+        className={[
+          'absolute top-2 right-2 z-10',
+          'min-w-[36px] min-h-[36px] rounded-full',
+          'bg-stone-700/80 hover:bg-stone-600 text-stone-300',
+          'text-xs flex items-center justify-center',
+          'transition-colors duration-100',
+        ].join(' ')}
+      >
+        ℹ
+      </button>
+
       {/* Placeholder area — stone background with first letter of name */}
       <div className="w-full aspect-square bg-stone-700 overflow-hidden relative flex items-center justify-center">
         <span

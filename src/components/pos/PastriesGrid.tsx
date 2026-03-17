@@ -10,6 +10,7 @@ interface PastriesGridProps {
   isError: boolean
   errorMessage?: string
   onRetry?: () => void
+  onDetail: (pastry: PastryDTO) => void
 }
 
 /**
@@ -25,6 +26,7 @@ export function PastriesGrid({
   isError,
   errorMessage,
   onRetry,
+  onDetail,
 }: PastriesGridProps) {
   const stablePastries = useMemo(() => pastries, [pastries])
 
@@ -70,7 +72,7 @@ export function PastriesGrid({
       <ul className="grid grid-cols-3 xl:grid-cols-4 gap-4" role="list">
         {stablePastries.map((pastry) => (
           <li key={pastry.id} role="listitem">
-            <PastryCard pastry={pastry} />
+            <PastryCard pastry={pastry} onDetail={onDetail} />
           </li>
         ))}
       </ul>
