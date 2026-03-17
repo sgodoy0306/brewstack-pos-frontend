@@ -4,6 +4,7 @@ import { ProductGrid } from '../components/pos/ProductGrid'
 import { PastriesGrid } from '../components/pos/PastriesGrid'
 import { CartPanelContent } from '../components/pos/CartPanel'
 import { AddPastryModal } from '../components/pos/AddPastryModal'
+import { ProductDetailModal } from '../components/pos/ProductDetailModal'
 import { useRecipes } from '../hooks/useRecipes'
 import { usePastries } from '../hooks/usePastries'
 import { useCartStore } from '../store/cartStore'
@@ -33,6 +34,7 @@ type ActiveCategory = 'coffees' | 'pastries'
 export function PosPage() {
   const [activeCategory, setActiveCategory] = useState<ActiveCategory>('coffees')
   const [isAddPastryModalOpen, setIsAddPastryModalOpen] = useState(false)
+  const [detailRecipe, setDetailRecipe] = useState<RecipeDTO | null>(null)
 
   const { recipes, isLoading: recipesLoading, isError: recipesError, error: recipesRawError, refetch: refetchRecipes } = useRecipes()
   const { pastries, isLoading: pastriesLoading, isError: pastriesError, error: pastriesRawError, refetch: refetchPastries } = usePastries()
@@ -145,6 +147,7 @@ export function PosPage() {
                   errorMessage={catalogErrorMessage}
                   onRetry={refetchRecipes}
                   onProductSelect={handleProductSelect}
+                  onDetail={setDetailRecipe}
                 />
               ) : (
                 <PastriesGrid
@@ -171,6 +174,12 @@ export function PosPage() {
         isOpen={isAddPastryModalOpen}
         onClose={() => setIsAddPastryModalOpen(false)}
         onSuccess={handlePastryAdded}
+      />
+
+      {/* Product Detail Modal — rendered outside PosLayout so z-index stacks correctly */}
+      <ProductDetailModal
+        recipe={detailRecipe}
+        onClose={() => setDetailRecipe(null)}
       />
     </>
   )
