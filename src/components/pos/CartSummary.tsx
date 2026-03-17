@@ -15,7 +15,11 @@ export function CartSummary() {
   const total = useCartStore((state) => state.total)
 
   return (
-    <div className="px-3 py-3 bg-stone-50 border-t border-stone-200">
+    <div
+      className="px-3 py-3 bg-stone-50 border-t border-stone-200"
+      aria-label="Order total breakdown"
+      role="region"
+    >
       {/* Subtotal row */}
       <div className="flex justify-between items-center py-1">
         <span className="text-stone-500 text-sm">Subtotal</span>

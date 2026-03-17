@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { BrowserRouter } from 'react-router-dom'
+import { ToastProvider } from './context/ToastContext'
+import { OfflineBanner } from './components/ui/OfflineBanner'
 import './index.css'
 import App from './App.tsx'
 
@@ -16,7 +18,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        {/* Non-blocking offline indicator — always at the top of the viewport */}
+        <OfflineBanner />
+        {/* Global toast notification system — wraps the whole app */}
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </BrowserRouter>
       {import.meta.env.DEV && <ReactQueryDevtools />}
     </QueryClientProvider>

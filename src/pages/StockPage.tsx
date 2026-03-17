@@ -6,6 +6,7 @@ import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { ErrorMessage } from '../components/ui/ErrorMessage'
 import { Badge } from '../components/ui/Badge'
 import { useStock, useRestock, useLowStock } from '../hooks/useStock'
+import { useToast } from '../context/ToastContext'
 import type { IngredientDTO } from '../types/stock'
 
 const PAGE_SIZE = 15
@@ -16,6 +17,7 @@ const PAGE_SIZE = 15
  * Displays a paginated list of all ingredients with their current stock levels.
  * Low-stock items are highlighted and a summary alert is shown at the top.
  * Tapping "Restock" on any row opens the RestockModal.
+ * Restock success/error feedback is delivered via the global toast system.
  */
 export function StockPage() {
   const [currentPage, setCurrentPage] = useState(0)
@@ -36,6 +38,7 @@ export function StockPage() {
   } = useLowStock()
 
   const { restock, isPending: isRestocking } = useRestock()
+  const { showSuccess, showError } = useToast()
 
   // Stable callbacks — prevent unnecessary child re-renders.
   const handleRestockClick = useCallback((ingredient: IngredientDTO) => {
@@ -48,26 +51,34 @@ export function StockPage() {
 
   const handleRestockConfirm = useCallback(
     (ingredientId: number, amount: number) => {
+      const ingredientName = selectedIngredient?.name ?? 'Ingredient'
       restock(
         { ingredientId, request: { amount } },
         {
           onSuccess: () => {
             setSelectedIngredient(null)
+            showSuccess(`${ingredientName} restocked successfully (+${amount})`)
+          },
+          onError: (err) => {
+            const message =
+              (err as { message?: string })?.message ?? 'Restock failed. Please try again.'
+            showError(message)
           },
         },
       )
     },
-    [restock],
+    [restock, selectedIngredient, showSuccess, showError],
   )
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-stone-100">
       <NavBar />
 
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden" aria-label="Stock management">
         {/* Page header */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-stone-200 shrink-0">
           <div className="flex items-center gap-3">
+            <span aria-hidden="true" className="text-xl">📦</span>
             <h1 className="text-xl font-bold text-stone-900">Stock</h1>
             {hasLowStock && (
               <Badge
@@ -144,12 +155,12 @@ export function StockPage() {
                   ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
                   : 'bg-stone-200 text-stone-800 hover:bg-stone-300 active:bg-stone-400 active:scale-95 cursor-pointer',
               ].join(' ')}
-              aria-label="Previous page"
+              aria-label="Go to previous page"
             >
               Previous
             </button>
 
-            <span className="text-sm text-stone-500 font-medium">
+            <span className="text-sm text-stone-500 font-medium" aria-live="polite">
               Page {currentPage + 1} of {totalPages}
             </span>
 
@@ -163,7 +174,7 @@ export function StockPage() {
                   ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
                   : 'bg-stone-200 text-stone-800 hover:bg-stone-300 active:bg-stone-400 active:scale-95 cursor-pointer',
               ].join(' ')}
-              aria-label="Next page"
+              aria-label="Go to next page"
             >
               Next
             </button>

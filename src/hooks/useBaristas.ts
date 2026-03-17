@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getBaristas, getBaristaById, practiceBarista } from '../services/baristaService'
+import { getBaristas, getBaristaById, practiceBarista, createBarista } from '../services/baristaService'
 import type { BaristaDTO, LevelUpDTO, PracticeRequest } from '../types/barista'
 import type { ApiErrorResponse } from '../types/error'
 
@@ -8,7 +8,7 @@ import type { ApiErrorResponse } from '../types/error'
  * Returns typed data, loading state, and error state — no business logic.
  */
 export function useBaristas() {
-  const { data, isLoading, isError, error } = useQuery<BaristaDTO[], ApiErrorResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<BaristaDTO[], ApiErrorResponse>({
     queryKey: ['baristas'],
     queryFn: getBaristas,
   })
@@ -18,6 +18,7 @@ export function useBaristas() {
     isLoading,
     isError,
     error,
+    refetch,
   }
 }
 
@@ -78,4 +79,19 @@ export function usePractice() {
     isError,
     error,
   }
+}
+
+/**
+ * Mutation to create a new barista.
+ * Only requires a name — level and totalXp default to 0 on creation.
+ * Invalidates the baristas list on success so the grid updates immediately.
+ */
+export function useCreateBarista() {
+  const queryClient = useQueryClient()
+  return useMutation<BaristaDTO, ApiErrorResponse, { name: string }>({
+    mutationFn: ({ name }) => createBarista({ name, level: 0, totalXp: 0 }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['baristas'] })
+    },
+  })
 }
