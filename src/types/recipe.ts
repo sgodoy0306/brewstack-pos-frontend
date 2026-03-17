@@ -10,6 +10,7 @@ export interface RecipeDTO {
   baseXpReward: number
   price: number
   imageUrl: string
+  description: string
   ingredients: RecipeIngredient[]
 }
 
