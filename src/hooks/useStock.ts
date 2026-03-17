@@ -11,7 +11,7 @@ import type { ApiErrorResponse } from '../types/error'
  * @param params - Optional page, size, and sort parameters forwarded to the API.
  */
 export function useStock(params: StockListParams = {}) {
-  const { data, isLoading, isError, error } = useQuery<StockPage, ApiErrorResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<StockPage, ApiErrorResponse>({
     queryKey: ['stock', params],
     queryFn: () => getStock(params),
   })
@@ -25,6 +25,7 @@ export function useStock(params: StockListParams = {}) {
     isLoading,
     isError,
     error,
+    refetch,
   }
 }
 

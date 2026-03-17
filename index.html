@@ -2,9 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+
+    <!--
+      Viewport: width=device-width prevents the browser from scaling down on tablets.
+      user-scalable=no + maximum-scale=1 prevent accidental pinch-zoom during
+      fast-paced tapping on the POS screen.
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- PWA / web app metadata -->
+    <meta name="application-name" content="BrewStack POS" />
+    <meta name="description" content="Coffee Shop Point of Sale — tablet-optimized" />
+    <meta name="theme-color" content="#78350f" />
+
+    <!-- iOS home-screen icon -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/pwa-192x192.png" />
+
+    <!-- iOS full-screen mode: hides the browser chrome when added to home screen -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BrewStack POS" />
+
+    <title>BrewStack POS</title>
   </head>
   <body>
     <div id="root"></div>

@@ -1,31 +1,44 @@
 import { useCallback, useState } from 'react'
 import { PosLayout } from '../components/layout/PosLayout'
 import { ProductGrid } from '../components/pos/ProductGrid'
+import { PastriesGrid } from '../components/pos/PastriesGrid'
 import { CartPanelContent } from '../components/pos/CartPanel'
+import { AddPastryModal } from '../components/pos/AddPastryModal'
 import { useRecipes } from '../hooks/useRecipes'
+import { usePastries } from '../hooks/usePastries'
 import { useCartStore } from '../store/cartStore'
+import { useToast } from '../context/ToastContext'
 import type { RecipeDTO } from '../types/recipe'
 import type { OrderSummaryDTO } from '../types/order'
+
+/** The two catalog tabs available in the POS left panel. */
+type ActiveCategory = 'coffees' | 'pastries'
 
 /**
  * Main POS page — the default route ("/").
  *
  * Responsibilities:
- * - Fetches the product catalog via useRecipes.
+ * - Renders category tabs ("Coffees & Infusions" / "Pastries") above the catalog grid.
+ * - Fetches the coffee product catalog via useRecipes.
+ * - Fetches the pastries catalog via usePastries.
  * - Wires ProductGrid → cart store (addItem on product tap).
+ * - PastryCard calls addItem directly from the store (no wiring needed here).
  * - Renders the cart panel with checkout capability.
- * - Handles order success/error feedback (banner-level, non-blocking).
+ * - Delegates success/error feedback to the global toast system (non-blocking).
+ * - Opens AddPastryModal when the user taps "+ Add Pastry" in the pastries tab.
  *
- * Barista selection is managed inside CartPanelContent (step 3.3) so this
- * page stays free of barista state.
+ * Barista selection is managed inside CartPanelContent so this page stays
+ * free of barista state.
  */
 export function PosPage() {
-  const { recipes, isLoading, isError, error, refetch } = useRecipes()
-  const addItem = useCartStore((state) => state.addItem)
+  const [activeCategory, setActiveCategory] = useState<ActiveCategory>('coffees')
+  const [isAddPastryModalOpen, setIsAddPastryModalOpen] = useState(false)
 
-  // Lightweight success/error banners — non-blocking, auto-dismiss via timeout.
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { recipes, isLoading: recipesLoading, isError: recipesError, error: recipesRawError, refetch: refetchRecipes } = useRecipes()
+  const { pastries, isLoading: pastriesLoading, isError: pastriesError, error: pastriesRawError, refetch: refetchPastries } = usePastries()
+
+  const addItem = useCartStore((state) => state.addItem)
+  const { showSuccess, showError } = useToast()
 
   const handleProductSelect = useCallback(
     (recipe: RecipeDTO) => {
@@ -34,65 +47,116 @@ export function PosPage() {
     [addItem],
   )
 
-  const handleOrderSuccess = useCallback((summary: OrderSummaryDTO) => {
-    const label =
-      summary.brewedRecipes.length === 1
-        ? `1 item brewed`
-        : `${summary.brewedRecipes.length} items brewed`
-    setSuccessMessage(`Order complete — ${label}. Total: $${summary.totalRevenue.toFixed(2)}`)
-    setErrorMessage(null)
-    // Auto-dismiss after 4 seconds.
-    setTimeout(() => setSuccessMessage(null), 4000)
-  }, [])
+  const handleOrderSuccess = useCallback(
+    (summary: OrderSummaryDTO) => {
+      const label =
+        summary.brewedRecipes.length === 1
+          ? '1 item brewed'
+          : `${summary.brewedRecipes.length} items brewed`
+      showSuccess(`Order complete — ${label}. Total: $${summary.totalRevenue.toFixed(2)}`)
+    },
+    [showSuccess],
+  )
 
-  const handleOrderError = useCallback((message: string) => {
-    setErrorMessage(message)
-    setSuccessMessage(null)
-    setTimeout(() => setErrorMessage(null), 5000)
-  }, [])
+  const handleOrderError = useCallback(
+    (message: string) => {
+      showError(message)
+    },
+    [showError],
+  )
+
+  // Fired by AddPastryModal on successful creation (before the user dismisses the
+  // success screen). Shows the toast immediately so it's visible as the user taps "Done".
+  const handlePastryAdded = useCallback(
+    (name: string) => {
+      showSuccess(`"${name}" has been added to the pastries catalog.`)
+    },
+    [showSuccess],
+  )
 
   const catalogErrorMessage =
-    error && 'message' in (error as object)
-      ? (error as { message: string }).message
+    recipesRawError && 'message' in (recipesRawError as object)
+      ? (recipesRawError as { message: string }).message
+      : undefined
+
+  const pastriesErrorMessage =
+    pastriesRawError && 'message' in (pastriesRawError as object)
+      ? (pastriesRawError as { message: string }).message
       : undefined
 
   return (
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden">
-      {/* ── Non-blocking notification banners ─────────────────────────── */}
-      {successMessage && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="absolute top-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
-        >
-          <div className="mt-2 mx-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl shadow-lg">
-            {successMessage}
-          </div>
-        </div>
-      )}
-      {errorMessage && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="absolute top-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
-        >
-          <div className="mt-2 mx-4 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-xl shadow-lg">
-            {errorMessage}
-          </div>
-        </div>
-      )}
-
-      {/* ── Main POS layout ────────────────────────────────────────────── */}
+    <>
       <PosLayout
         catalog={
-          <ProductGrid
-            recipes={recipes}
-            isLoading={isLoading}
-            isError={isError}
-            errorMessage={catalogErrorMessage}
-            onRetry={refetch}
-            onProductSelect={handleProductSelect}
-          />
+          <div className="flex flex-col h-full overflow-hidden">
+            {/* ── Category tabs + Add Pastry button ── */}
+            <div className="flex items-center gap-2 px-4 pt-3 pb-2 shrink-0">
+              <button
+                type="button"
+                className={[
+                  'flex-1 min-h-[52px] rounded-xl font-semibold text-sm transition-colors',
+                  activeCategory === 'coffees'
+                    ? 'bg-amber-500 text-stone-900'
+                    : 'bg-stone-700 text-stone-300 hover:bg-stone-600',
+                ].join(' ')}
+                onClick={() => setActiveCategory('coffees')}
+                aria-pressed={activeCategory === 'coffees'}
+              >
+                ☕ Coffees & Infusions
+              </button>
+              <button
+                type="button"
+                className={[
+                  'flex-1 min-h-[52px] rounded-xl font-semibold text-sm transition-colors',
+                  activeCategory === 'pastries'
+                    ? 'bg-amber-500 text-stone-900'
+                    : 'bg-stone-700 text-stone-300 hover:bg-stone-600',
+                ].join(' ')}
+                onClick={() => setActiveCategory('pastries')}
+                aria-pressed={activeCategory === 'pastries'}
+              >
+                🥐 Pastries
+              </button>
+
+              {/* "+ Add Pastry" button — only visible in the pastries tab */}
+              {activeCategory === 'pastries' && (
+                <button
+                  type="button"
+                  onClick={() => setIsAddPastryModalOpen(true)}
+                  className={[
+                    'min-h-[52px] px-4 rounded-xl font-semibold text-sm transition-colors shrink-0',
+                    'bg-stone-700 text-stone-300 hover:bg-stone-600 active:scale-95',
+                    'border border-stone-600',
+                  ].join(' ')}
+                  aria-label="Add a new pastry to the catalog"
+                >
+                  + Add Pastry
+                </button>
+              )}
+            </div>
+
+            {/* ── Catalog content — fills remaining height ── */}
+            <div className="flex-1 min-h-0">
+              {activeCategory === 'coffees' ? (
+                <ProductGrid
+                  recipes={recipes}
+                  isLoading={recipesLoading}
+                  isError={recipesError}
+                  errorMessage={catalogErrorMessage}
+                  onRetry={refetchRecipes}
+                  onProductSelect={handleProductSelect}
+                />
+              ) : (
+                <PastriesGrid
+                  pastries={pastries}
+                  isLoading={pastriesLoading}
+                  isError={pastriesError}
+                  errorMessage={pastriesErrorMessage}
+                  onRetry={refetchPastries}
+                />
+              )}
+            </div>
+          </div>
         }
         cart={
           <CartPanelContent
@@ -101,6 +165,13 @@ export function PosPage() {
           />
         }
       />
-    </div>
+
+      {/* Add Pastry Modal — rendered outside PosLayout to sit above all layers */}
+      <AddPastryModal
+        isOpen={isAddPastryModalOpen}
+        onClose={() => setIsAddPastryModalOpen(false)}
+        onSuccess={handlePastryAdded}
+      />
+    </>
   )
 }
