@@ -8,7 +8,7 @@ import type { ApiErrorResponse } from '../types/error'
  * Returns typed data, loading state, and error state — no business logic.
  */
 export function useRecipes() {
-  const { data, isLoading, isError, error } = useQuery<RecipeDTO[], ApiErrorResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<RecipeDTO[], ApiErrorResponse>({
     queryKey: ['recipes'],
     queryFn: getRecipes,
   })
@@ -18,6 +18,7 @@ export function useRecipes() {
     isLoading,
     isError,
     error,
+    refetch,
   }
 }
 
