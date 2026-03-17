@@ -19,5 +19,6 @@ export interface CreateRecipeRequest {
   baseXpReward: number
   price: number
   imageUrl: string
+  description: string
   ingredients: { ingredientId: number; quantity: number }[]
 }

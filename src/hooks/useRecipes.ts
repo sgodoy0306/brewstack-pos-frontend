@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { getRecipes, getRecipeById } from '../services/recipeService'
-import type { RecipeDTO } from '../types/recipe'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getRecipes, getRecipeById, createRecipe } from '../services/recipeService'
+import type { RecipeDTO, CreateRecipeRequest } from '../types/recipe'
 import type { ApiErrorResponse } from '../types/error'
 
 /**
@@ -20,6 +20,20 @@ export function useRecipes() {
     error,
     refetch,
   }
+}
+
+/**
+ * Mutation to create a new recipe.
+ * Invalidates the 'recipes' query on success so the catalog refreshes immediately.
+ */
+export function useCreateRecipe() {
+  const queryClient = useQueryClient()
+  return useMutation<RecipeDTO, ApiErrorResponse, CreateRecipeRequest>({
+    mutationFn: (payload) => createRecipe(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipes'] })
+    },
+  })
 }
 
 /**

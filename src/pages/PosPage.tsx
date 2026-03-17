@@ -4,6 +4,7 @@ import { ProductGrid } from '../components/pos/ProductGrid'
 import { PastriesGrid } from '../components/pos/PastriesGrid'
 import { CartPanelContent } from '../components/pos/CartPanel'
 import { AddPastryModal } from '../components/pos/AddPastryModal'
+import { AddRecipeModal } from '../components/pos/AddRecipeModal'
 import { ProductDetailModal } from '../components/pos/ProductDetailModal'
 import { PastryDetailModal } from '../components/pos/PastryDetailModal'
 import { useRecipes } from '../hooks/useRecipes'
@@ -36,6 +37,7 @@ type ActiveCategory = 'coffees' | 'pastries'
 export function PosPage() {
   const [activeCategory, setActiveCategory] = useState<ActiveCategory>('coffees')
   const [isAddPastryModalOpen, setIsAddPastryModalOpen] = useState(false)
+  const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false)
   const [detailRecipe, setDetailRecipe] = useState<RecipeDTO | null>(null)
   const [detailPastry, setDetailPastry] = useState<PastryDTO | null>(null)
 
@@ -75,6 +77,14 @@ export function PosPage() {
   const handlePastryAdded = useCallback(
     (name: string) => {
       showSuccess(`"${name}" has been added to the pastries catalog.`)
+    },
+    [showSuccess],
+  )
+
+  // Fired by AddRecipeModal on successful creation.
+  const handleRecipeAdded = useCallback(
+    (name: string) => {
+      showSuccess(`"${name}" has been added to the coffees catalog.`)
     },
     [showSuccess],
   )
@@ -122,6 +132,22 @@ export function PosPage() {
               >
                 🥐 Pastries
               </button>
+
+              {/* "+ Add Coffee" button — only visible in the coffees tab */}
+              {activeCategory === 'coffees' && (
+                <button
+                  type="button"
+                  onClick={() => setIsAddRecipeModalOpen(true)}
+                  className={[
+                    'min-h-[52px] px-4 rounded-xl font-semibold text-sm transition-colors shrink-0',
+                    'bg-stone-700 text-stone-300 hover:bg-stone-600 active:scale-95',
+                    'border border-stone-600',
+                  ].join(' ')}
+                  aria-label="Add a new coffee recipe to the catalog"
+                >
+                  + Add Coffee
+                </button>
+              )}
 
               {/* "+ Add Pastry" button — only visible in the pastries tab */}
               {activeCategory === 'pastries' && (
@@ -171,6 +197,13 @@ export function PosPage() {
             onOrderError={handleOrderError}
           />
         }
+      />
+
+      {/* Add Coffee Modal — rendered outside PosLayout to sit above all layers */}
+      <AddRecipeModal
+        isOpen={isAddRecipeModalOpen}
+        onClose={() => setIsAddRecipeModalOpen(false)}
+        onSuccess={handleRecipeAdded}
       />
 
       {/* Add Pastry Modal — rendered outside PosLayout to sit above all layers */}
