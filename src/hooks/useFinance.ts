@@ -10,7 +10,7 @@ import type { ApiErrorResponse } from '../types/error'
  * without requiring a manual refresh.
  */
 export function useDailyReport() {
-  const { data, isLoading, isError, error } = useQuery<DailyBalanceDTO, ApiErrorResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<DailyBalanceDTO, ApiErrorResponse>({
     queryKey: ['dailyReport'],
     queryFn: getDailyReport,
     refetchInterval: 30_000,
@@ -21,6 +21,7 @@ export function useDailyReport() {
     isLoading,
     isError,
     error,
+    refetch,
   }
 }
 
@@ -31,7 +32,7 @@ export function useDailyReport() {
  * @param params - Optional page and size parameters forwarded to the API.
  */
 export function useFinanceHistory(params: FinanceHistoryParams = {}) {
-  const { data, isLoading, isError, error } = useQuery<FinanceHistoryPage, ApiErrorResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<FinanceHistoryPage, ApiErrorResponse>({
     queryKey: ['financeHistory', params],
     queryFn: () => getFinanceHistory(params),
   })
@@ -45,5 +46,6 @@ export function useFinanceHistory(params: FinanceHistoryParams = {}) {
     isLoading,
     isError,
     error,
+    refetch,
   }
 }
