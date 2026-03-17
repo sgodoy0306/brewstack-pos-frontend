@@ -16,8 +16,8 @@ import type { OrderSummaryDTO } from '../types/order'
  * - Renders the cart panel with checkout capability.
  * - Handles order success/error feedback (banner-level, non-blocking).
  *
- * BaristaSelector integration is deferred to step 3.3; baristaId defaults to
- * 0 until that selector is available.
+ * Barista selection is managed inside CartPanelContent (step 3.3) so this
+ * page stays free of barista state.
  */
 export function PosPage() {
   const { recipes, isLoading, isError, error, refetch } = useRecipes()
@@ -96,7 +96,6 @@ export function PosPage() {
         }
         cart={
           <CartPanelContent
-            baristaId={0}
             onOrderSuccess={handleOrderSuccess}
             onOrderError={handleOrderError}
           />
