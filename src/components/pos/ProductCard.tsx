@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import type { RecipeDTO } from '../../types/recipe'
+import { DEFAULT_RECIPE_IMAGES } from '../../utils/recipeImages'
 
 interface ProductCardProps {
   recipe: RecipeDTO
@@ -58,9 +59,9 @@ export const ProductCard = memo(function ProductCard({ recipe, onSelect, onDetai
 
       {/* Product image */}
       <div className="w-full aspect-square bg-cream-100 overflow-hidden">
-        {recipe.imageUrl ? (
+        {(recipe.imageUrl || DEFAULT_RECIPE_IMAGES[recipe.name]) ? (
           <img
-            src={recipe.imageUrl}
+            src={recipe.imageUrl || DEFAULT_RECIPE_IMAGES[recipe.name]}
             alt={recipe.name}
             loading="lazy"
             className="w-full h-full object-cover"
