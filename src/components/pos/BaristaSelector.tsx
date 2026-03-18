@@ -34,7 +34,7 @@ export function BaristaSelector({ value, onChange, className = '' }: BaristaSele
         htmlFor="barista-select"
         className="text-xs font-semibold uppercase tracking-wide text-stone-500 px-1"
       >
-        Barista
+        Barista <span className="normal-case font-normal">(optional)</span>
       </label>
 
       {/* Select — touch target is the full min-h-[60px] row */}
@@ -66,9 +66,9 @@ export function BaristaSelector({ value, onChange, className = '' }: BaristaSele
             .filter(Boolean)
             .join(' ')}
         >
-          {/* Default / unassigned option */}
+          {/* Default / unassigned option — selecting this processes the order without a barista */}
           <option value={0}>
-            {isLoading ? 'Loading baristas…' : 'Choose barista'}
+            {isLoading ? 'Loading baristas…' : 'No barista assigned'}
           </option>
 
           {/* Barista options — only rendered once data is available */}

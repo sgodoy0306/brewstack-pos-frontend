@@ -6,8 +6,7 @@ import type { OrderSummaryDTO } from '../../types/order'
 interface CheckoutButtonProps {
   /**
    * ID of the barista assigned to this order.
-   * Will be required once BaristaSelector (step 3.3) is wired in.
-   * Defaults to 0 (no barista) so the cart is functional before 3.3.
+   * Pass 0 or omit to process the order without a barista assignment.
    */
   baristaId?: number
   /** Called with the server response after a successful order placement. */
@@ -52,9 +51,13 @@ export function CheckoutButton({
       Array.from({ length: item.quantity }, () => item.recipe.id),
     )
 
+    // Normalise: treat 0 as "no barista" and send null so the backend
+    // skips XP assignment instead of rejecting the request.
+    const resolvedBaristaId = baristaId && baristaId > 0 ? baristaId : null
+
     setIsSubmitting(true)
     try {
-      const summary = await placeOrderAsync({ recipeIds, baristaId })
+      const summary = await placeOrderAsync({ recipeIds, baristaId: resolvedBaristaId })
       clearCart()
       onSuccess?.(summary)
     } catch (err) {
