@@ -94,6 +94,11 @@ export function PosPage() {
     setDetailRecipe(null)
   }, [showSuccess])
 
+  const handlePastryDeleted = useCallback(() => {
+    showSuccess('Pastry deleted successfully.')
+    setDetailPastry(null)
+  }, [showSuccess])
+
   const catalogErrorMessage =
     recipesRawError && 'message' in (recipesRawError as object)
       ? (recipesRawError as { message: string }).message
@@ -229,6 +234,7 @@ export function PosPage() {
       <PastryDetailModal
         pastry={detailPastry}
         onClose={() => setDetailPastry(null)}
+        onDeleted={handlePastryDeleted}
       />
     </>
   )

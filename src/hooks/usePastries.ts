@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getPastries, createPastry } from '../services/pastryService'
+import { getPastries, createPastry, deletePastry } from '../services/pastryService'
 import type { PastryDTO, CreatePastryRequest } from '../types/pastry'
 import type { ApiErrorResponse } from '../types/error'
 
@@ -30,6 +30,20 @@ export function useCreatePastry() {
   const queryClient = useQueryClient()
   return useMutation<PastryDTO, ApiErrorResponse, CreatePastryRequest>({
     mutationFn: (payload) => createPastry(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pastries'] })
+    },
+  })
+}
+
+/**
+ * Mutation to delete a pastry by ID.
+ * Invalidates the pastries list on success so the grid updates immediately.
+ */
+export function useDeletePastry() {
+  const queryClient = useQueryClient()
+  return useMutation<void, ApiErrorResponse, number>({
+    mutationFn: (id) => deletePastry(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pastries'] })
     },
