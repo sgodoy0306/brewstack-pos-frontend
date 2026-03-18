@@ -19,3 +19,12 @@ export async function createPastry(payload: CreatePastryRequest): Promise<Pastry
   const response = await apiClient.post<PastryDTO>('/pastries', payload)
   return response.data
 }
+
+/**
+ * Deletes a pastry by its ID.
+ * @param id - The pastry ID to delete.
+ * @returns void (HTTP 204).
+ */
+export async function deletePastry(id: number): Promise<void> {
+  await apiClient.delete(`/pastries/${id}`)
+}
