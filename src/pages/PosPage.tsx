@@ -89,6 +89,11 @@ export function PosPage() {
     [showSuccess],
   )
 
+  const handleRecipeDeleted = useCallback(() => {
+    showSuccess('Recipe deleted successfully.')
+    setDetailRecipe(null)
+  }, [showSuccess])
+
   const catalogErrorMessage =
     recipesRawError && 'message' in (recipesRawError as object)
       ? (recipesRawError as { message: string }).message
@@ -217,6 +222,7 @@ export function PosPage() {
       <ProductDetailModal
         recipe={detailRecipe}
         onClose={() => setDetailRecipe(null)}
+        onDeleted={handleRecipeDeleted}
       />
 
       {/* Pastry Detail Modal — rendered outside PosLayout so z-index stacks correctly */}
