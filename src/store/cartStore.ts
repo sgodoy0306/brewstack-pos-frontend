@@ -15,11 +15,9 @@ interface CartState {
   items: CartItem[]
 
   // ─── Derived values ────────────────────────────────────────────────────────
-  /** Sum of all line totals before tax. */
+  /** Sum of all line totals. */
   subtotal: number
-  /** Tax amount (subtotal × TAX_RATE). */
-  tax: number
-  /** Grand total (subtotal + tax). */
+  /** Grand total (equals subtotal — no tax applied). */
   total: number
   /** Total number of individual units across all items. */
   itemCount: number
@@ -44,19 +42,14 @@ interface CartState {
   clearCart: () => void
 }
 
-/** Tax rate applied to the cart subtotal (8%). */
-const TAX_RATE = 0.08
-
 /**
  * Recalculate all derived totals from the current items array.
  * Keeping this as a pure helper makes the store reducers readable.
  */
-function computeTotals(items: CartItem[]): Pick<CartState, 'subtotal' | 'tax' | 'total' | 'itemCount'> {
+function computeTotals(items: CartItem[]): Pick<CartState, 'subtotal' | 'total' | 'itemCount'> {
   const subtotal = items.reduce((acc, item) => acc + item.lineTotal, 0)
-  const tax = subtotal * TAX_RATE
-  const total = subtotal + tax
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0)
-  return { subtotal, tax, total, itemCount }
+  return { subtotal, total: subtotal, itemCount }
 }
 
 /**
@@ -72,7 +65,6 @@ function computeTotals(items: CartItem[]): Pick<CartState, 'subtotal' | 'tax' | 
 export const useCartStore = create<CartState>((set) => ({
   items: [],
   subtotal: 0,
-  tax: 0,
   total: 0,
   itemCount: 0,
 
@@ -154,5 +146,5 @@ export const useCartStore = create<CartState>((set) => ({
     }),
 
   clearCart: () =>
-    set({ items: [], subtotal: 0, tax: 0, total: 0, itemCount: 0 }),
+    set({ items: [], subtotal: 0, total: 0, itemCount: 0 }),
 }))
