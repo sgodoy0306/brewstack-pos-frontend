@@ -41,7 +41,7 @@ export function ProductDetailModal({ recipe, onClose }: ProductDetailModalProps)
           </h2>
 
           {/* Description — rendered only when non-empty */}
-          {recipe.description.trim().length > 0 && (
+          {recipe.description?.trim().length > 0 && (
             <p className="text-stone-400 text-sm mt-1">{recipe.description}</p>
           )}
         </div>
