@@ -90,7 +90,7 @@ export function AddIngredientModal({ isOpen, onClose, onSuccess }: AddIngredient
   /** Shared input class builder — reduces repetition across the four fields. */
   const inputClasses = (disabled: boolean) =>
     [
-      'min-h-[60px] px-4 rounded-xl text-base text-stone-100',
+      'w-full min-h-[60px] px-4 rounded-xl text-base text-stone-100',
       'bg-stone-700 border-2 border-stone-600',
       'placeholder:text-stone-500',
       'focus:outline-none focus:border-amber-500',
@@ -200,7 +200,7 @@ export function AddIngredientModal({ isOpen, onClose, onSuccess }: AddIngredient
 
             {/* Initial stock + Minimum threshold — side by side */}
             <div className="flex gap-3">
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <label
                   htmlFor="ingredient-stock-input"
                   className="text-sm font-semibold text-stone-300"
@@ -221,7 +221,7 @@ export function AddIngredientModal({ isOpen, onClose, onSuccess }: AddIngredient
                 />
               </div>
 
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <label
                   htmlFor="ingredient-threshold-input"
                   className="text-sm font-semibold text-stone-300"
