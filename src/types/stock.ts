@@ -16,3 +16,10 @@ export interface StockPage {
   totalPages: number
   number: number
 }
+
+export interface CreateIngredientRequest {
+  name: string
+  currentStock: number
+  minimumThreshold: number
+  unit: string
+}

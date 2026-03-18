@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { NavBar } from '../components/layout/NavBar'
 import { IngredientRow } from '../components/stock/IngredientRow'
 import { RestockModal } from '../components/stock/RestockModal'
+import { AddIngredientModal } from '../components/stock/AddIngredientModal'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { ErrorMessage } from '../components/ui/ErrorMessage'
 import { Badge } from '../components/ui/Badge'
@@ -22,6 +23,7 @@ const PAGE_SIZE = 15
 export function StockPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [selectedIngredient, setSelectedIngredient] = useState<IngredientDTO | null>(null)
+  const [isAddIngredientOpen, setIsAddIngredientOpen] = useState(false)
 
   const {
     ingredients,
@@ -39,6 +41,13 @@ export function StockPage() {
 
   const { restock, isPending: isRestocking } = useRestock()
   const { showSuccess, showError } = useToast()
+
+  const handleAddIngredientSuccess = useCallback(
+    (name: string) => {
+      showSuccess(`${name} added to stock successfully`)
+    },
+    [showSuccess],
+  )
 
   // Stable callbacks — prevent unnecessary child re-renders.
   const handleRestockClick = useCallback((ingredient: IngredientDTO) => {
@@ -89,20 +98,35 @@ export function StockPage() {
             )}
           </div>
 
-          {/* Low-stock alert banner — non-blocking, informational only */}
-          {hasLowStock && (
-            <div
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-300"
-              role="status"
-              aria-live="polite"
+          <div className="flex items-center gap-3">
+            {/* Low-stock alert banner — non-blocking, informational only */}
+            {hasLowStock && (
+              <div
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-300"
+                role="status"
+                aria-live="polite"
+              >
+                <span aria-hidden="true">⚠</span>
+                <span className="text-sm font-semibold text-amber-800">
+                  {lowStockIngredients.length} ingredient
+                  {lowStockIngredients.length !== 1 ? 's' : ''} below minimum threshold
+                </span>
+              </div>
+            )}
+
+            <button
+              onClick={() => setIsAddIngredientOpen(true)}
+              className={[
+                'min-h-[60px] px-5 rounded-xl font-semibold text-sm',
+                'bg-amber-500 text-white',
+                'hover:bg-amber-600 active:bg-amber-700 active:scale-95',
+                'transition-all duration-100 select-none cursor-pointer',
+              ].join(' ')}
+              aria-label="Add new ingredient"
             >
-              <span aria-hidden="true">⚠</span>
-              <span className="text-sm font-semibold text-amber-800">
-                {lowStockIngredients.length} ingredient
-                {lowStockIngredients.length !== 1 ? 's' : ''} below minimum threshold
-              </span>
-            </div>
-          )}
+              + Add Ingredient
+            </button>
+          </div>
         </div>
 
         {/* Content area — scrollable ingredient list */}
@@ -188,6 +212,13 @@ export function StockPage() {
         isPending={isRestocking}
         onConfirm={handleRestockConfirm}
         onClose={handleModalClose}
+      />
+
+      {/* Add Ingredient modal — rendered at page level so it overlays everything */}
+      <AddIngredientModal
+        isOpen={isAddIngredientOpen}
+        onClose={() => setIsAddIngredientOpen(false)}
+        onSuccess={handleAddIngredientSuccess}
       />
     </div>
   )

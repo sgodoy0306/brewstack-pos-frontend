@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getStock, getLowStock, restockIngredient } from '../services/stockService'
+import { getStock, getLowStock, restockIngredient, createIngredient } from '../services/stockService'
 import type { StockListParams } from '../services/stockService'
-import type { IngredientDTO, RestockRequest, StockPage } from '../types/stock'
+import type { IngredientDTO, RestockRequest, StockPage, CreateIngredientRequest } from '../types/stock'
 import type { ApiErrorResponse } from '../types/error'
 
 /**
@@ -45,6 +45,36 @@ export function useLowStock() {
     lowStockIngredients: data ?? [],
     hasLowStock: (data?.length ?? 0) > 0,
     isLoading,
+    isError,
+    error,
+  }
+}
+
+/**
+ * Mutation to create a new stock ingredient.
+ * Invalidates the paginated stock list on success so the new ingredient
+ * appears immediately without requiring a manual refresh.
+ */
+export function useCreateIngredient() {
+  const queryClient = useQueryClient()
+
+  const { mutate, mutateAsync, isPending, isError, error, data } = useMutation<
+    IngredientDTO,
+    ApiErrorResponse,
+    CreateIngredientRequest
+  >({
+    mutationFn: createIngredient,
+    onSuccess: () => {
+      // Invalidate all stock query variants to reflect the newly added ingredient.
+      queryClient.invalidateQueries({ queryKey: ['stock'] })
+    },
+  })
+
+  return {
+    createIngredient: mutate,
+    createIngredientAsync: mutateAsync,
+    createdIngredient: data,
+    isPending,
     isError,
     error,
   }

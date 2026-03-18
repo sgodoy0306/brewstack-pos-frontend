@@ -1,5 +1,5 @@
 import apiClient from '../api/axios'
-import type { IngredientDTO, RestockRequest, StockPage } from '../types/stock'
+import type { IngredientDTO, RestockRequest, StockPage, CreateIngredientRequest } from '../types/stock'
 
 /** Parameters accepted by the paginated stock list endpoint. */
 export interface StockListParams {
@@ -38,5 +38,15 @@ export async function getLowStock(): Promise<IngredientDTO[]> {
  */
 export async function restockIngredient(id: number, payload: RestockRequest): Promise<IngredientDTO> {
   const response = await apiClient.patch<IngredientDTO>(`/stock/${id}/restock`, payload)
+  return response.data
+}
+
+/**
+ * Creates a new stock ingredient.
+ * @param payload - The ingredient data (name, currentStock, minimumThreshold, unit).
+ * @returns The newly created IngredientDTO.
+ */
+export async function createIngredient(payload: CreateIngredientRequest): Promise<IngredientDTO> {
+  const response = await apiClient.post<IngredientDTO>('/stock', payload)
   return response.data
 }
