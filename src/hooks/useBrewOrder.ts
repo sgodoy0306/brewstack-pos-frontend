@@ -29,8 +29,12 @@ export function useBrewOrder() {
       queryClient.invalidateQueries({ queryKey: ['stock'] })
       queryClient.invalidateQueries({ queryKey: ['lowStock'] })
 
-      // The assigned barista gains XP; refresh their record and the full list.
-      queryClient.invalidateQueries({ queryKey: ['barista', variables.baristaId] })
+      // Refresh the assigned barista's record only when one was provided.
+      // When baristaId is null/undefined the order had no barista — skip the
+      // individual record invalidation to avoid a redundant cache miss.
+      if (variables.baristaId != null) {
+        queryClient.invalidateQueries({ queryKey: ['barista', variables.baristaId] })
+      }
       queryClient.invalidateQueries({ queryKey: ['baristas'] })
 
       // Revenue for the day changes after every order.

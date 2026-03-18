@@ -1,6 +1,7 @@
 export interface BrewOrderRequest {
   recipeIds: number[]
-  baristaId: number
+  /** Optional — when omitted or null the order is processed without a barista assignment. */
+  baristaId?: number | null
 }
 
 export interface OrderSummaryDTO {
