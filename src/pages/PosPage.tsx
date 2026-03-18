@@ -114,45 +114,43 @@ export function PosPage() {
       <PosLayout
         catalog={
           <div className="flex flex-col h-full overflow-hidden">
-            {/* ── Category tabs + Add Pastry button ── */}
-            <div className="flex items-center gap-2 px-4 pt-3 pb-2 shrink-0">
-              <button
-                type="button"
-                className={[
-                  'flex-1 min-h-[52px] rounded-xl font-semibold text-sm transition-colors',
-                  activeCategory === 'coffees'
-                    ? 'bg-amber-500 text-stone-900'
-                    : 'bg-stone-700 text-stone-300 hover:bg-stone-600',
-                ].join(' ')}
-                onClick={() => setActiveCategory('coffees')}
-                aria-pressed={activeCategory === 'coffees'}
-              >
-                ☕ Coffees & Infusions
-              </button>
-              <button
-                type="button"
-                className={[
-                  'flex-1 min-h-[52px] rounded-xl font-semibold text-sm transition-colors',
-                  activeCategory === 'pastries'
-                    ? 'bg-amber-500 text-stone-900'
-                    : 'bg-stone-700 text-stone-300 hover:bg-stone-600',
-                ].join(' ')}
-                onClick={() => setActiveCategory('pastries')}
-                aria-pressed={activeCategory === 'pastries'}
-              >
-                🥐 Pastries
-              </button>
+            {/* ── Category tabs + Add button ── */}
+            <div className="flex items-center gap-1 px-3 pt-3 pb-2 shrink-0">
+              <div className="flex items-center gap-1 flex-1">
+                <button
+                  type="button"
+                  className={[
+                    'flex-1 flex items-center justify-center gap-2 h-[40px] rounded-lg text-sm font-medium transition-all duration-100 select-none active:scale-95 cursor-pointer',
+                    activeCategory === 'coffees'
+                      ? 'bg-stone-700 text-amber-400 border border-stone-500 shadow-[0_2px_8px_rgba(0,0,0,0.4)]'
+                      : 'text-stone-500 hover:text-stone-300 border border-stone-700 shadow-[0_2px_6px_rgba(0,0,0,0.35)]',
+                  ].join(' ')}
+                  onClick={() => setActiveCategory('coffees')}
+                  aria-pressed={activeCategory === 'coffees'}
+                >
+                  ☕ Coffees & Infusions
+                </button>
+                <button
+                  type="button"
+                  className={[
+                    'flex-1 flex items-center justify-center gap-2 h-[40px] rounded-lg text-sm font-medium transition-all duration-100 select-none active:scale-95 cursor-pointer',
+                    activeCategory === 'pastries'
+                      ? 'bg-stone-700 text-amber-400 border border-stone-500 shadow-[0_2px_8px_rgba(0,0,0,0.4)]'
+                      : 'text-stone-500 hover:text-stone-300 border border-stone-700 shadow-[0_2px_6px_rgba(0,0,0,0.35)]',
+                  ].join(' ')}
+                  onClick={() => setActiveCategory('pastries')}
+                  aria-pressed={activeCategory === 'pastries'}
+                >
+                  🥐 Pastries
+                </button>
+              </div>
 
               {/* "+ Add Coffee" button — only visible in the coffees tab */}
               {activeCategory === 'coffees' && (
                 <button
                   type="button"
                   onClick={() => setIsAddRecipeModalOpen(true)}
-                  className={[
-                    'min-h-[52px] px-4 rounded-xl font-semibold text-sm transition-colors shrink-0',
-                    'bg-stone-700 text-stone-300 hover:bg-stone-600 active:scale-95',
-                    'border border-stone-600',
-                  ].join(' ')}
+                  className="h-[48px] px-4 rounded-xl text-sm font-medium transition-colors shrink-0 bg-stone-800 text-stone-300 hover:text-stone-100 border border-stone-700 hover:border-stone-500 active:scale-95"
                   aria-label="Add a new coffee recipe to the catalog"
                 >
                   + Add Coffee
@@ -164,11 +162,7 @@ export function PosPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddPastryModalOpen(true)}
-                  className={[
-                    'min-h-[52px] px-4 rounded-xl font-semibold text-sm transition-colors shrink-0',
-                    'bg-stone-700 text-stone-300 hover:bg-stone-600 active:scale-95',
-                    'border border-stone-600',
-                  ].join(' ')}
+                  className="h-[48px] px-4 rounded-xl text-sm font-medium transition-colors shrink-0 bg-stone-800 text-stone-300 hover:text-stone-100 border border-stone-700 hover:border-stone-500 active:scale-95"
                   aria-label="Add a new pastry to the catalog"
                 >
                   + Add Pastry

@@ -68,7 +68,7 @@ export function BaristaSelector({ value, onChange, className = '' }: BaristaSele
         >
           {/* Default / unassigned option */}
           <option value={0}>
-            {isLoading ? 'Loading baristas…' : '— No barista —'}
+            {isLoading ? 'Loading baristas…' : 'Choose barista'}
           </option>
 
           {/* Barista options — only rendered once data is available */}
